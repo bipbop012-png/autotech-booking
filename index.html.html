@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AutoTech VA — Book an Appointment</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+  }
+
+  .logo {
+    font-size: 28px;
+    font-weight: 800;
+    color: #38bdf8;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 32px;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  input, select {
+    width: 100%;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-size: 15px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus, select:focus {
+    border-color: #38bdf8;
+  }
+
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.7);
+    cursor: pointer;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+
+  .btn-primary {
+    background: #38bdf8;
+    color: #0f172a;
+  }
+
+  .btn-primary:hover { background: #7dd3fc; }
+  .btn-primary:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+
+  .btn-suggestion {
+    background: #1e3a5f;
+    border: 1px solid #38bdf8;
+    color: #7dd3fc;
+    font-size: 14px;
+    padding: 12px;
+    border-radius: 8px;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    margin-bottom: 8px;
+  }
+
+  .btn-suggestion:hover {
+    background: #1d4ed8;
+    border-color: #7dd3fc;
+    color: #fff;
+  }
+
+  /* Status boxes */
+  .alert {
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-top: 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    display: none;
+  }
+
+  .alert-success {
+    background: #052e16;
+    border: 1px solid #16a34a;
+    color: #4ade80;
+  }
+
+  .alert-error {
+    background: #2d0a0a;
+    border: 1px solid #dc2626;
+    color: #f87171;
+  }
+
+  .alert-conflict {
+    background: #1c1917;
+    border: 1px solid #d97706;
+    color: #fbbf24;
+  }
+
+  .suggestions-box {
+    margin-top: 16px;
+    display: none;
+  }
+
+  .suggestions-title {
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid #0f172a;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .event-link {
+    color: #38bdf8;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .event-link:hover { text-decoration: underline; }
+
+  .divider {
+    border: none;
+    border-top: 1px solid #334155;
+    margin: 24px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">⚡ AutoTech VA</div>
+  <div class="subtitle">Book your appointment below</div>
+
+  <form id="bookingForm">
+    <label>Full Name</label>
+    <input type="text" id="name" placeholder="Juan Dela Cruz" required/>
+
+    <label>Email Address</label>
+    <input type="email" id="email" placeholder="juan@email.com" required/>
+
+    <label>Service</label>
+    <select id="service">
+      <option value="Consultation">Consultation</option>
+      <option value="Follow-up">Follow-up</option>
+      <option value="Technical Support">Technical Support</option>
+      <option value="General Inquiry">General Inquiry</option>
+    </select>
+
+    <label>Preferred Date & Time (Manila Time)</label>
+    <input type="datetime-local" id="datetime" required/>
+
+    <label>Duration</label>
+    <select id="duration">
+      <option value="30">30 minutes</option>
+      <option value="60">1 hour</option>
+      <option value="90">1.5 hours</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary" id="submitBtn">
+      Book Appointment
+    </button>
+  </form>
+
+  <!-- Success -->
+  <div class="alert alert-success" id="successAlert"></div>
+
+  <!-- Error -->
+  <div class="alert alert-error" id="errorAlert"></div>
+
+  <!-- Conflict + Suggestions -->
+  <div class="alert alert-conflict" id="conflictAlert"></div>
+  <div class="suggestions-box" id="suggestionsBox">
+    <div class="suggestions-title">⚡ Available Slots — Click to Book Instantly</div>
+    <div id="suggestionsList"></div>
+  </div>
+</div>
+
+<script>
+  const WEBHOOK = 'https://n8n-dkeh.onrender.com/webhook/book';
+
+  // Set minimum datetime to now + 1 hour
+  const dtInput = document.getElementById('datetime');
+  const now = new Date();
+  now.setHours(now.getHours() + 1, 0, 0, 0);
+  dtInput.min = now.toISOString().slice(0, 16);
+
+  function hide(...ids) { ids.forEach(id => document.getElementById(id).style.display = 'none'); }
+  function show(id, type = 'block') { document.getElementById(id).style.display = type; }
+
+  function toManilaISO(localDatetimeStr) {
+    // datetime-local gives "YYYY-MM-DDTHH:mm" — treat as Manila time (+08:00)
+    return localDatetimeStr + ':00+08:00';
+  }
+
+  async function submitBooking(preferredStart, isRetry = false) {
+    const name     = document.getElementById('name').value.trim();
+    const email    = document.getElementById('email').value.trim();
+    const service  = document.getElementById('service').value;
+    const duration = Number(document.getElementById('duration').value);
+
+    hide('successAlert', 'errorAlert', 'conflictAlert', 'suggestionsBox');
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Booking...';
+
+    try {
+      const body = { name, email, service, duration_min: duration };
+
+      // Use selected_start for 1-click suggestions, preferred_start for form
+      if (isRetry) {
+        body.selected_start = preferredStart;
+      } else {
+        body.preferred_start = toManilaISO(preferredStart);
+      }
+
+      const res  = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+
+      if (res.status === 200 && data.success) {
+        // ✅ Success
+        document.getElementById('successAlert').innerHTML = `
+          ✅ <strong>Booking Confirmed!</strong><br/>
+          📅 ${data.start} – ${data.end} (${data.tz})<br/>
+          🔗 <a class="event-link" href="${data.event_link}" target="_blank">View Calendar Event</a>
+        `;
+        show('successAlert');
+        document.getElementById('bookingForm').reset();
+
+      } else if (res.status === 409) {
+        // ⚠️ Conflict
+        document.getElementById('conflictAlert').innerHTML = `
+          ⚠️ <strong>${data.message}</strong><br/>
+          Requested: ${data.requested?.start} – ${data.requested?.end}
+        `;
+        show('conflictAlert');
+
+        // Show suggestion buttons
+        const suggestions = data.suggestions || [];
+        if (suggestions.length > 0) {
+          const list = document.getElementById('suggestionsList');
+          list.innerHTML = '';
+          suggestions.forEach(s => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-suggestion';
+            btn.innerHTML = `🗓 <strong>${s.start_pretty}</strong> – ${s.end_pretty}`;
+            btn.onclick = () => submitBooking(s.selected_start, true);
+            list.appendChild(btn);
+          });
+          show('suggestionsBox');
+        }
+
+      } else {
+        // ❌ Validation / other error
+        document.getElementById('errorAlert').innerHTML =
+          `❌ <strong>Error:</strong> ${data.message || 'Something went wrong.'}`;
+        show('errorAlert');
+      }
+
+    } catch (err) {
+      document.getElementById('errorAlert').innerHTML =
+        `❌ <strong>Network error:</strong> ${err.message}`;
+      show('errorAlert');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'Book Appointment';
+    }
+  }
+
+  document.getElementById('bookingForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const datetimeVal = document.getElementById('datetime').value;
+    if (!datetimeVal) return;
+    submitBooking(datetimeVal, false);
+  });
+</script>
+</body>
+</html>
