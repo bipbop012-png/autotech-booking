@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Reschedule Appointment</title>
+
+<style>
+body{
+  font-family:system-ui;
+  background:#0f172a;
+  color:#e2e8f0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+}
+
+.card{
+  background:#1e293b;
+  padding:30px;
+  border-radius:14px;
+  width:100%;
+  max-width:420px;
+  text-align:center;
+}
+
+input,button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:8px;
+  border:none;
+  font-size:15px;
+}
+
+input{
+  background:#0f172a;
+  color:white;
+  border:1px solid #334155;
+}
+
+button{
+  background:#2563eb;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#1d4ed8;
+}
+
+.msg{
+  margin-top:15px;
+  font-size:14px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="card">
+  <h2>Reschedule Appointment</h2>
+
+  <div id="loading">Checking booking...</div>
+
+  <div id="content" style="display:none">
+    <p id="bookingInfo"></p>
+
+```
+<label>Select new date & time</label>
+<input type="datetime-local" id="newTime"/>
+
+<button onclick="reschedule()">Confirm Reschedule</button>
+```
+
+  </div>
+
+  <div class="msg" id="message"></div>
+</div>
+
+<script>
+const API_CHECK  = "https://n8n-dkeh.onrender.com/webhook/reschedule-check";
+const API_APPLY  = "https://n8n-dkeh.onrender.com/webhook/reschedule-apply";
+
+const params = new URLSearchParams(window.location.search);
+const token = params.get("t");
+
+if(!token){
+  document.getElementById("loading").innerText = "Invalid link.";
+} else {
+  validateToken();
+}
+
+async function validateToken(){
+  try{
+    const res = await fetch(`${API_CHECK}?t=${token}`);
+    const data = await res.json();
+
+    if(!data.valid){
+      document.getElementById("loading").innerText = "This reschedule link is invalid or expired.";
+      return;
+    }
+
+    document.getElementById("loading").style.display="none";
+    document.getElementById("content").style.display="block";
+
+    document.getElementById("bookingInfo").innerHTML =
+      `<b>${data.name}</b><br>${data.start}`;
+
+  }catch(e){
+    document.getElementById("loading").innerText = "Connection error.";
+  }
+}
+
+async function reschedule(){
+  const newTime = document.getElementById("newTime").value;
+  if(!newTime) return alert("Please choose a new time");
+
+  document.getElementById("message").innerText = "Updating booking...";
+
+  const res = await fetch(API_APPLY,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      token: token,
+      new_start: newTime + ":00+08:00"
+    })
+  });
+
+  const data = await res.json();
+
+  if(data.success){
+    document.getElementById("message").innerHTML =
+      "✅ Rescheduled successfully!";
+  } else {
+    document.getElementById("message").innerText =
+      data.message || "Unable to reschedule.";
+  }
+}
+</script>
+
+</body>
+</html>
